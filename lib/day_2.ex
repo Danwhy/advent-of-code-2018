@@ -4,10 +4,7 @@ defmodule Advent.Day2 do
       File.read!(input)
       |> String.split("\n")
 
-    case part do
-      1 -> part_1(input)
-      2 -> part_2(input)
-    end
+    apply(__MODULE__, String.to_existing_atom("part_" <> to_string(part)), [input])
   end
 
   def part_1(input) do
