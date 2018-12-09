@@ -8,5 +8,7 @@ defmodule AdventTest do
 
     assert Advent.run(:day_2)
     assert Advent.run(:day_2, 2)
+
+    assert Advent.run(:day_3) == 104_126
   end
 end
