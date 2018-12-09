@@ -12,7 +12,16 @@ defmodule Advent.Day3 do
     |> get_size()
     |> create_fabric()
     |> place_claims(input)
-    |> count_overlaps()
+    |> count_cells(:overlap)
+  end
+
+  def part_2(input) do
+    input
+    |> get_size()
+    |> create_fabric()
+    |> place_claims(input)
+    |> find_non_overlapping(input)
+    |> List.first()
   end
 
   def get_size(input) do
@@ -31,7 +40,7 @@ defmodule Advent.Day3 do
   end
 
   def parse_claim(claim) do
-    [id, measurement_string] = String.split(claim, "@") |> Enum.map(&String.trim/1)
+    ["#" <> id, measurement_string] = String.split(claim, "@") |> Enum.map(&String.trim/1)
 
     [offsets, lengths] = String.split(measurement_string, ":") |> Enum.map(&String.trim/1)
 
@@ -70,9 +79,22 @@ defmodule Advent.Day3 do
     end)
   end
 
-  def count_overlaps(fabric) do
+  def count_cells(fabric, cell) do
     Enum.reduce(fabric, 0, fn r, acc ->
-      acc + Enum.count(r, fn c -> c == :overlap end)
+      acc + Enum.count(r, fn c -> c == cell end)
     end)
+  end
+
+  def find_non_overlapping(fabric, input) do
+    Task.async_stream(input, fn claim ->
+      {id, _x_offset, _y_offset, x_length, y_length} = parse_claim(claim)
+
+      cond do
+        count_cells(fabric, id) == x_length * y_length -> id
+        true -> nil
+      end
+    end)
+    |> Enum.filter(fn {:ok, id} -> not is_nil(id) end)
+    |> Enum.map(fn {:ok, id} -> id end)
   end
 end

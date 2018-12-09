@@ -29,4 +29,11 @@ defmodule AdventTest.Day3Test do
       assert Advent.Day3.part_1(["#123 @ 3,2: 5x4", "#456 @  1,1: 3x2"]) == 1
     end
   end
+
+  describe "Day 3 - part 2" do
+    test "part 2" do
+      assert Advent.Day3.part_2(["#1 @ 1,3: 4x4", "#2 @ 3,1: 4x4", "#3 @ 5,5: 2x2"]) == "3"
+      assert Advent.Day3.part_2(["#123 @ 3,2: 5x4"]) == "123"
+    end
+  end
 end
