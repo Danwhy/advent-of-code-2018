@@ -2,19 +2,34 @@ defmodule AdventTest do
   use ExUnit.Case
   doctest Advent
 
-  test "Solution Day 1" do
-    assert Advent.run(:day_1) == 416
-    assert Advent.run(:day_1, 2) == 56752
+  describe "Solution Day 1" do
+    test "Part 1" do
+      assert Advent.run(:day_1) == 416
+    end
+
+    test "Part 2" do
+      assert Advent.run(:day_1, 2) == 56752
+    end
   end
 
-  test "Solution Day 2" do
-    assert Advent.run(:day_2) == 6723
-    assert Advent.run(:day_2, 2) == "prtkqyluiusocwvaezjmhmfgx"
+  describe "Solution Day 2" do
+    test "Part 1" do
+      assert Advent.run(:day_2) == 6723
+    end
+
+    test "Part 2" do
+      assert Advent.run(:day_2, 2) == "prtkqyluiusocwvaezjmhmfgx"
+    end
   end
 
-  @tag timeout: 100_000
-  test "Solution Day 3" do
-    assert Advent.run(:day_3) == 104_126
-    assert Advent.run(:day_3, 2) == "695"
+  describe "Solution Day 3" do
+    test "Part 1" do
+      assert Advent.run(:day_3) == 104_126
+    end
+
+    @tag timeout: 100_000, skip: "So slow"
+    test "Part 2" do
+      assert Advent.run(:day_3, 2) == "695"
+    end
   end
 end
