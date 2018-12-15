@@ -8,13 +8,7 @@ defmodule Advent.Day4 do
   end
 
   def part_1(input) do
-    report =
-      input
-      |> Enum.sort_by(fn r ->
-        {month, day, hour, minute, _} = parse_record(r)
-        month <> day <> hour <> minute
-      end)
-      |> create_report()
+    report = create_report(input)
 
     guard =
       report
@@ -27,8 +21,40 @@ defmodule Advent.Day4 do
     String.to_integer(guard) * minute
   end
 
+  def part_2(input) do
+    input
+    |> create_report()
+    |> Enum.reduce([], fn a, acc ->
+      if i = Enum.find_index(acc, fn r -> r.id == a.id end) do
+        List.update_at(acc, i, fn r ->
+          Map.put(
+            r,
+            :times_asleep,
+            r.times_asleep
+            |> Enum.with_index()
+            |> Enum.map(fn {e, index} ->
+              case Enum.at(Map.get(a, :asleep), index) do
+                true -> e + 1
+                _ -> e
+              end
+            end)
+          )
+        end)
+      else
+        [%{id: a.id, times_asleep: Enum.map(a.asleep, fn e -> if e, do: 1, else: 0 end)} | acc]
+      end
+    end)
+    |> most_frequently_asleep()
+    |> (fn {{id, _}, minute} -> String.to_integer(id) * minute end).()
+  end
+
   def create_report(records) do
-    Enum.reduce(records, [], fn r, acc ->
+    records
+    |> Enum.sort_by(fn r ->
+      {month, day, hour, minute, _} = parse_record(r)
+      month <> day <> hour <> minute
+    end)
+    |> Enum.reduce([], fn r, acc ->
       {month, day, hour, minute, details} = parse_record(r)
 
       case details do
@@ -130,6 +156,25 @@ defmodule Advent.Day4 do
       a |> Tuple.to_list() |> Enum.count(& &1)
     end)
     |> elem(1)
+  end
+
+  def most_frequently_asleep(report) do
+    report
+    |> Enum.reduce(List.duplicate({nil, 0}, 60), fn r, acc ->
+      acc
+      |> Enum.with_index()
+      |> Enum.map(fn {{id, mins}, i} ->
+        ta = Map.get(r, :times_asleep) |> Enum.at(i)
+
+        if ta > mins do
+          {Map.get(r, :id), ta}
+        else
+          {id, mins}
+        end
+      end)
+    end)
+    |> Enum.with_index()
+    |> Enum.max_by(fn {{_id, minutes}, _index} -> minutes end)
   end
 
   def pad_zero(num) do
