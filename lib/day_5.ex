@@ -12,6 +12,15 @@ defmodule Advent.Day5 do
     |> length()
   end
 
+  def part_2(input) do
+    ?a..?z
+    |> Enum.map(fn c ->
+      input |> remove_polymer(c) |> String.split("", trim: true) |> compare_adjacent([])
+    end)
+    |> Enum.min_by(&length/1)
+    |> length()
+  end
+
   def compare_adjacent([], new), do: new
 
   def compare_adjacent([head | tail], []), do: compare_adjacent(tail, [head])
@@ -24,5 +33,12 @@ defmodule Advent.Day5 do
       true ->
         compare_adjacent(tail, [head | new])
     end
+  end
+
+  def remove_polymer(input, char) do
+    {:ok, regex} =
+      Regex.compile("[#{String.downcase(to_string([char]))}#{String.upcase(to_string([char]))}]")
+
+    Regex.replace(regex, input, "")
   end
 end

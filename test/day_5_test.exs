@@ -15,4 +15,10 @@ defmodule AdventTest.Day5Test do
              ) == ["o"]
     end
   end
+
+  describe "Day 5 - part 2" do
+    test "part 2" do
+      assert Advent.Day5.part_2("dabAcCaCBAcCcaDA") == 4
+    end
+  end
 end
