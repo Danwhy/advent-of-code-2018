@@ -29,6 +29,14 @@ defmodule Advent.Day6 do
     |> elem(0)
   end
 
+  def part_2(input, proximity \\ 10_000) do
+    input
+    |> find_largest()
+    |> create_grid()
+    |> find_distances(input)
+    |> find_within_proximity(proximity)
+  end
+
   def find_largest(input) do
     Enum.reduce(input, {0, 0}, fn {x, y}, {acc_x, acc_y} ->
       cond do
@@ -90,5 +98,23 @@ defmodule Advent.Day6 do
       [List.last(r) | acc]
     end)
     |> Enum.uniq()
+  end
+
+  def find_distances(grid, input) do
+    Enum.map(grid, fn row ->
+      Enum.map(row, fn {x, y} ->
+        Enum.reduce(input, 0, fn c, acc ->
+          acc + manhattan_distance(c, {x, y})
+        end)
+      end)
+    end)
+  end
+
+  def find_within_proximity(grid, proximity) do
+    Enum.reduce(grid, 0, fn row, acc ->
+      Enum.reduce(row, acc, fn p, r_acc ->
+        if p < proximity, do: r_acc + 1, else: r_acc
+      end)
+    end)
   end
 end

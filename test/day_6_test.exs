@@ -87,4 +87,27 @@ defmodule AdventTest.Day6Test do
              ) == [2, 1, 1]
     end
   end
+
+  describe "Day 6 - part 2" do
+    test "part 1" do
+      assert Advent.Day6.part_2([{1, 1}, {1, 6}, {8, 3}, {3, 4}, {5, 5}, {8, 9}], 32) == 16
+    end
+
+    test "find_distances" do
+      assert Advent.Day6.find_distances(
+               [
+                 [{0, 0}, {1, 0}, {2, 0}],
+                 [{0, 1}, {1, 1}, {2, 1}],
+                 [{0, 2}, {1, 2}, {2, 2}],
+                 [{0, 3}, {1, 3}, {2, 3}]
+               ],
+               [{0, 1}, {1, 2}, {2, 3}]
+             ) == [
+               [9, 8, 9],
+               [6, 5, 6],
+               [5, 4, 5],
+               [6, 5, 6]
+             ]
+    end
+  end
 end
