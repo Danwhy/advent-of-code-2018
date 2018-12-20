@@ -52,4 +52,10 @@ defmodule AdventTest do
       assert Advent.run(:day_5, 2) == 4052
     end
   end
+
+  describe "Solution Day 6" do
+    test "Part 1" do
+      assert Advent.run(:day_6) == 4976
+    end
+  end
 end
