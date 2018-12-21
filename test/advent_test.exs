@@ -67,5 +67,9 @@ defmodule AdventTest do
     test "Part 1" do
       assert Advent.run(:day_7) == "ABLCFNSXZPRHVEGUYKDIMQTWJO"
     end
+
+    test "Part 2" do
+      assert Advent.run(:day_7, 2) == 1157
+    end
   end
 end

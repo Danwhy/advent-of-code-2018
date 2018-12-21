@@ -16,4 +16,10 @@ defmodule AdventTest.Day7Test do
       assert Advent.Day7.part_1(@input) == "CABDFE"
     end
   end
+
+  describe "Day 7 - part 2" do
+    test "part 2" do
+      assert Advent.Day7.part_2(@input, 2) == 258
+    end
+  end
 end
