@@ -82,4 +82,11 @@ defmodule AdventTest do
       assert Advent.run(:day_8, 2) == 33649
     end
   end
+
+  describe "Solution Day 9" do
+    @tag timeout: 100_000, skip: "So slow"
+    test "Part 1" do
+      assert Advent.run(:day_9) == 393_229
+    end
+  end
 end
