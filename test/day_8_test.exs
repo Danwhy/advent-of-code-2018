@@ -43,4 +43,10 @@ defmodule AdventTest.Day8Test do
                 }}
     end
   end
+
+  describe "Day 8 - part 2" do
+    test "part 2" do
+      assert Advent.Day8.part_2(@input) == 66
+    end
+  end
 end

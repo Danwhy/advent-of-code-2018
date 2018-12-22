@@ -14,6 +14,13 @@ defmodule Advent.Day8 do
     |> add_metadata(0)
   end
 
+  def part_2(input) do
+    input
+    |> create_tree()
+    |> elem(1)
+    |> get_node_value(0)
+  end
+
   def create_tree([num_children | [num_meta | tail]]) do
     node = create_node(num_children, num_meta)
 
@@ -47,5 +54,19 @@ defmodule Advent.Day8 do
         _ -> acc
       end
     end)
+  end
+
+  def get_node_value(nil, count), do: count
+
+  def get_node_value(node, count) do
+    case node |> Map.get(:children) |> length do
+      0 ->
+        Enum.reduce(Map.get(node, :meta), count, &(String.to_integer(&1) + &2))
+
+      _ ->
+        Enum.reduce(Map.get(node, :meta), count, fn i, acc ->
+          get_node_value(Enum.at(Map.get(node, :children), String.to_integer(i) - 1), acc)
+        end)
+    end
   end
 end
