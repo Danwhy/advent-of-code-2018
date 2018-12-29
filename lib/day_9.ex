@@ -39,47 +39,170 @@ defmodule Advent.Day9 do
   end
 
   def play_game({num_players, points}) do
-    Enum.reduce(1..points, {[0], List.duplicate(0, num_players), 0}, fn p,
-                                                                        {board, players, current} ->
-      place_next_marble(board, players, current, p)
+    init_board = CircularList.new([0])
+    init_players = List.duplicate(0, num_players)
+
+    Enum.reduce(1..points, {init_board, init_players}, fn p, {board, players} ->
+      place_next_marble(board, players, p)
     end)
   end
 
-  def place_next_marble(board, players, current, next_marble) do
-    board_length = length(board)
-
+  def place_next_marble(board, players, next_marble) do
     case Integer.mod(next_marble, 23) do
       0 ->
-        cond do
-          current - 7 < 0 ->
-            {List.delete_at(board, board_length - (7 - current)),
-             update_scores(players, next_marble, board, board_length - (7 - current)),
-             board_length - (7 - current)}
+        board = Enum.reduce(1..7, board, fn _, board -> CircularList.previous(board) end)
 
-          true ->
-            {List.delete_at(board, current - 7),
-             update_scores(players, next_marble, board, current - 7), current - 7}
-        end
+        {CircularList.delete(board), update_scores(players, next_marble, CircularList.get(board))}
 
       _ ->
-        cond do
-          current + 2 > board_length ->
-            {List.insert_at(board, 1, next_marble), players, 1}
-
-          current + 2 == board_length ->
-            {List.insert_at(board, -1, next_marble), players, board_length}
-
-          true ->
-            {List.insert_at(board, current + 2, next_marble), players, current + 2}
-        end
+        {board |> CircularList.next() |> CircularList.next() |> CircularList.insert(next_marble),
+         players}
     end
   end
 
-  def update_scores(players, next_marble, board, value_to_remove) do
+  def update_scores(players, next_marble, value_to_remove) do
     List.update_at(
       players,
       Integer.mod(next_marble, length(players)) - 1,
-      &(&1 + next_marble + Enum.at(board, value_to_remove))
+      &(&1 + next_marble + value_to_remove)
     )
   end
+end
+
+defmodule CircularList do
+  @doc """
+  Creates a new circular list
+  ## Examples
+
+      iex> CircularList.new([])
+      {[], []}
+
+      iex> CircularList.new([1, 2, 3])
+      {[], [1, 2, 3]}
+  """
+  def new(list \\ []), do: {[], list}
+
+  @doc """
+  Returns the current element.
+
+  ## Examples
+
+      iex> CircularList.get({[], []})
+      nil
+
+      iex> CircularList.get({[], [1, 2, 3]})
+      1
+  """
+  def get({_, [head | _]}), do: head
+  def get({[], []}), do: nil
+
+  @doc """
+  Moves to the next element.
+
+  ## Examples
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...> CircularList.next(list)
+      {[1], [2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.next()
+      {[2, 1], [3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.next() |> CircularList.next() |> CircularList.next()
+      {[1], [2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.get()
+      2
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.next() |> CircularList.get()
+      3
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.next() |> CircularList.next() |> CircularList.get()
+      1
+  """
+  def next({visited, [head | []]}), do: {[], Enum.reverse([head | visited])}
+  def next({visited, [head | remaining]}), do: {[head | visited], remaining}
+
+  @doc """
+  Moves to the previous element.
+
+  ## Examples
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...> CircularList.previous(list)
+      {[2, 1], [3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.previous(list) |> CircularList.previous()
+      {[1], [2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.previous(list) |> CircularList.get()
+      3
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.previous(list) |> CircularList.previous() |> CircularList.get()
+      2
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.previous(list) |> CircularList.previous() |> CircularList.previous() |> CircularList.get()
+      1
+  """
+  def previous({[head | visited], remaining}), do: {visited, [head | remaining]}
+
+  def previous({[], remaining}) do
+    [head | tail] = Enum.reverse(remaining)
+    {tail, [head]}
+  end
+
+  @doc """
+  Inserts an element in the current position.
+
+  ## Examples
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...> CircularList.insert(list, 5)
+      {[], [5, 1, 2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.insert(5)
+      {[1], [5, 2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.insert(list, 5) |> CircularList.get()
+      5
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.insert(list, 5) |> CircularList.next() |> CircularList.get()
+      1
+  """
+  def insert({visited, remaining}, element), do: {visited, [element | remaining]}
+
+  @doc """
+  Deletes the element in the current position.
+
+  ## Examples
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...> CircularList.delete(list)
+      {[], [2, 3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.delete()
+      {[1], [3]}
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.delete(list) |> CircularList.get()
+      2
+
+      iex> list = CircularList.new([1, 2, 3])
+      ...>   CircularList.next(list) |> CircularList.delete() |> CircularList.get()
+      3
+  """
+  def delete({visited, [_ | remaining]}), do: {visited, remaining}
 end

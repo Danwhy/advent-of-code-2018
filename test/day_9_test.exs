@@ -1,5 +1,6 @@
 defmodule AdventTest.Day9Test do
   use ExUnit.Case
+  doctest CircularList
 
   describe "Day 9 - part 1" do
     test "part 1" do
