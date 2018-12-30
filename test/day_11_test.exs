@@ -5,18 +5,22 @@ defmodule AdventTest.Day11Test do
     test "build grid" do
       row = fn row_num ->
         Advent.Day11.build_grid(18)
-        |> Enum.map(fn {c, _} -> c end)
-        |> Enum.at(row_num)
-        |> Enum.map(fn {c, _} -> c end)
+        |> elem(row_num)
       end
 
-      assert Enum.slice(row.(45), 33..35) == [4, 4, 4]
-      assert Enum.slice(row.(46), 33..35) == [3, 3, 4]
-      assert Enum.slice(row.(47), 33..35) == [1, 2, 4]
+      assert elem(row.(45), 33) == 4
+      assert elem(row.(45), 34) == 4
+      assert elem(row.(45), 35) == 4
+      assert elem(row.(46), 33) == 3
+      assert elem(row.(46), 34) == 3
+      assert elem(row.(46), 35) == 4
+      assert elem(row.(47), 33) == 1
+      assert elem(row.(47), 34) == 2
+      assert elem(row.(47), 35) == 4
     end
 
     test "calculate total power" do
-      assert Advent.Day11.calculate_total_power(Advent.Day11.build_grid(18), 33, 45) == 29
+      assert Advent.Day11.calculate_total_power(Advent.Day11.build_grid(18), 33, 45, 3) == 29
     end
 
     test "part 1" do

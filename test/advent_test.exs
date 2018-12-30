@@ -103,5 +103,10 @@ defmodule AdventTest do
     test "Part 1" do
       assert Advent.run(:day_11) == {243, 27}
     end
+
+    @tag skip: "Too slow"
+    test "Part 2" do
+      assert Advent.run(:day_11, 2) == {{88, {284, 172}}, 11}
+    end
   end
 end

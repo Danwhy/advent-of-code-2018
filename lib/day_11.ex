@@ -8,19 +8,26 @@ defmodule Advent.Day11 do
   def part_1(input) do
     input
     |> build_grid()
-    |> find_largest_power()
-    |> elem(2)
+    |> find_largest_power(3)
+    |> elem(1)
+  end
+
+  def part_2(input) do
+    input
+    |> build_grid()
+    |> (fn g ->
+          Enum.map(1..300, fn size ->
+            find_largest_power(g, size)
+          end)
+        end).()
+    |> Enum.with_index()
+    |> Enum.max_by(fn {{power, _}, _} -> power end)
   end
 
   def build_grid(serial) do
-    nil
-    |> List.duplicate(300)
-    |> Enum.with_index()
-    |> List.duplicate(300)
-    |> Enum.with_index()
-    |> Enum.map(fn {row, y} ->
-      {Enum.map(row, fn {_, x} -> {calculate_power(serial, x, y), x} end), y}
-    end)
+    List.to_tuple(
+      for y <- 0..299, do: for(x <- 0..299, do: calculate_power(serial, x, y)) |> List.to_tuple()
+    )
   end
 
   def calculate_power(serial, x, y) do
@@ -35,13 +42,13 @@ defmodule Advent.Day11 do
     |> Kernel.-(5)
   end
 
-  def find_largest_power(grid) do
-    Enum.reduce(grid, {0, 0, {nil, nil}}, fn {row, y}, acc ->
-      Enum.reduce(row, acc, fn {cell, x}, {_, max_power, _} = acc ->
+  def find_largest_power(grid, size) do
+    Enum.reduce(0..299, {0, {nil, nil}}, fn y, acc ->
+      Enum.reduce(0..299, acc, fn x, {max_power, _} = acc ->
         cond do
-          x < length(row) - 3 && y < length(grid) - 3 ->
-            if (power = calculate_total_power(grid, x, y)) > max_power do
-              {cell, power, {x, y}}
+          x < 300 - size && y < 300 - size ->
+            if (power = calculate_total_power(grid, x, y, size)) > max_power do
+              {power, {x, y}}
             else
               acc
             end
@@ -53,14 +60,13 @@ defmodule Advent.Day11 do
     end)
   end
 
-  def calculate_total_power(grid, x, y) do
-    Enum.reduce(0..2, 0, fn i, acc ->
-      row = grid |> Enum.at(y + i) |> elem(0)
+  def calculate_total_power(grid, x, y, size) do
+    Enum.reduce(0..(size - 1), 0, fn i, acc ->
+      row = elem(grid, y + i)
 
-      Enum.reduce(0..2, acc, fn j, acc ->
+      Enum.reduce(0..(size - 1), acc, fn j, acc ->
         row
-        |> Enum.at(x + j)
-        |> elem(0)
+        |> elem(x + j)
         |> Kernel.+(acc)
       end)
     end)
