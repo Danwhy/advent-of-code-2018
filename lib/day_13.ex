@@ -1,6 +1,4 @@
 defmodule Advent.Day13 do
-  require IEx
-
   def calculate(part, input) do
     input = input |> File.read!()
 
